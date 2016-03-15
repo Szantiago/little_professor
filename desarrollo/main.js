@@ -2,6 +2,9 @@ import utils from "./utils";
 
 let nivel       = 1,
     operacion   = "+",
+    ope ="",
+    respu=0,
+    encRespuesta="",
     setActivado = false,
     operadores  = ["/", "*", "-", "+"];
 
@@ -40,7 +43,8 @@ let presionaTecla = opc =>
         else
         {
             setActivado = false;
-            utils.accesoDOM("lcd").innerHTML = "";
+            valAleatorio();
+            utils.accesoDOM("lcd").innerHTML = `${ope} =`;
         }
     }
     else
@@ -50,9 +54,83 @@ let presionaTecla = opc =>
             //Se debe mostrar una ecuación de forma aleatoria en el LCD...
             //Se debe validar que la respuesta dada por el usuario sea válida...
             //Se debe validar que la operación que se haga es relacionada al valor que está guardada en ecuación...
-            console.log(`Número seleccionado: ${opc}`);
+            //---
+            operation(opc);
         }
+      }
+};
+
+let operation = (opc) =>
+{
+  if(operacion!=="/"){
+  if(respu>=0){
+  encRespuesta+=opc;
+    if(encRespuesta.length===String(respu).length){
+      if(Number(encRespuesta)===respu){
+        utils.accesoDOM("lcd").innerHTML ="correcto";
+        encRespuesta="";
+        console.log(`Número seleccionado: ${opc}, ${encRespuesta}`);
+      }else{
+        utils.accesoDOM("lcd").innerHTML ="incorrecto";
+        encRespuesta="";
+      }
     }
+  }else{
+    encRespuesta+=operacion;
+    encRespuesta+=opc;
+    if(encRespuesta.length===String(respu).length){
+      if(Number(encRespuesta)===respu){
+        utils.accesoDOM("lcd").innerHTML ="correcto";
+        encRespuesta="";
+        console.log(`Número seleccionado: ${opc}, ${encRespuesta}`);
+      }else{
+        utils.accesoDOM("lcd").innerHTML ="incorrecto";
+        encRespuesta="";
+      }
+    }
+  }
+  }else{
+    let punto;
+    let respuNPunto
+  //rdondea el valor para que solo tenga 2 decimales
+    respu=Math.round(respu * 100) / 100;
+    respuNPunto=respu+"";
+    punto = String(respuNPunto).indexOf(".");
+    respuNPunto=respuNPunto.split("");
+    delete respuNPunto[punto];
+    respuNPunto=respuNPunto.join("");
+    encRespuesta+=opc;
+    if(encRespuesta.length===String(respuNPunto).length){
+      if(Number(encRespuesta)===Number(respuNPunto)){
+        utils.accesoDOM("lcd").innerHTML ="correcto";
+        encRespuesta="";
+      }else{
+        utils.accesoDOM("lcd").innerHTML =`incorrecto`;
+        encRespuesta="";
+      }
+    }
+  }
+
+};
+
+let valAleatorio=()=>
+{
+  let aleatorio = {aleatorio1 : 0, aleatorio2 : 0};
+  let maxMin = {max :0, min : 0};
+  if(nivel === 1){
+    aleatorio.aleatorio1 = Math.floor(Math.random() * nivel*10);
+    aleatorio.aleatorio2 = Math.floor(Math.random() * nivel*10);
+    ope = (`${aleatorio.aleatorio1} ${operacion} ${aleatorio.aleatorio2}`);
+  }else
+  {
+    maxMin.max=nivel*10;
+    maxMin.min=maxMin.max-10;
+    aleatorio.aleatorio1 = Math.floor(Math.random()*(maxMin.max-maxMin.min+1)+maxMin.min);
+    aleatorio.aleatorio2 = Math.floor(Math.random() *(maxMin.max-maxMin.min+1)+maxMin.min);
+    ope = (`${aleatorio.aleatorio1} ${operacion} ${aleatorio.aleatorio2}`);
+  }
+  respu = eval(ope);
+  console.log(respu);
 };
 
 let crearBotones = () =>
